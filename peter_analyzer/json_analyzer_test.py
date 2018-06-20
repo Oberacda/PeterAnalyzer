@@ -1,14 +1,31 @@
 import unittest
+from typing import TextIO
+
 from peter_analyzer import json_analyzer
 
 class PeterJsonDecoderTest(unittest.TestCase):
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
+    jsonDecoder : json_analyzer.PeterJsonDecoder
+    fullDatabaseFile : TextIO
+    singleDatabaseEntry : TextIO
+    invalidDatabaseEntry : TextIO
 
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
+    def setUp(self):
+        self.fullDatabaseFile = open("../resources/db-2018-06-19.json")
+        self.singleDatabaseEntry = open("../resources/example_entry.json")
+        self.invalidDatabaseEntry = open("../resources/db-2018-06-19.jso")
+        self.jsonDecoder = json_analyzer.PeterJsonDecoder()
+
+    def tearDown(self):
+        self.fullDatabaseFile.close()
+        self.singleDatabaseEntry.close()
+        self.invalidDatabaseEntry.close()
+
+    def test_decoding(self):
+        self.jsonDecoder.decode(self.fullDatabaseFile)
+
+    def test_decoding_invalid(self):
+        self.assertListEqual(self.jsonDecoder.decode(self.invalidDatabaseEntry), list())
 
     def test_split(self):
         s = 'hello world'

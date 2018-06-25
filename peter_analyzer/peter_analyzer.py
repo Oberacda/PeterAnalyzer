@@ -40,16 +40,20 @@ class PeterAnalyzer(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+        notebook = ttk.Notebook(container)
+        notebook.grid(row=0, column=0, sticky="nsew")
+
+
         self.frames = {}
 
         for F in (StartPage, PageOne, PageTwo, PageThree):
-            frame = F(container, self)
+            frame = F(notebook, self)
 
             self.frames[F] = frame
-
-            frame.grid(row=0, column=0, sticky="nsew")
+            notebook.add(frame)
 
         self.show_frame(StartPage)
+
 
     def show_frame(self, cont):
         frame = self.frames[cont]

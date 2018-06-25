@@ -6,22 +6,54 @@ import datetime
 
 
 class Key:
-    line: list
-    code: int
-    name: str
-    time: str
+    """
+    Key event triggerd by the user during the trial.
+    """
 
+    __line: list
+    __code: int
+    __name: str
+    __time: str
+
+    def __init__(self, line:list, code:int, name:str, time:datetime.datetime):
+        """
+        Creates a new key event.
+        :param line: the lines shown to the user while the key was pressed.
+        :param code: the code of the key press.
+        :param name: the name of the key event.
+        :param time: the time the event occurred.
+        """
+        self.__line = list
+        self.__code = code
+        self.__name = name
+        self.__time = time
 
 class Event:
-    code: str
-    type: str
-    time: str
+    """
+    Class representing a single event that occures during a trial.
+    """
+
+    __code: str
+    __type: str
+    __time: datetime.datetime
+
+    def __init__(self, code:str, type:str, time:datetime.datetime):
+        """
+        Creates a new event.
+        :param code: code of the event.
+        :param type: the type of the event, may be Clock or Snipplet.
+        :param time: the time the event occurred.
+        """
+        self.__code = code
+        self.__type = type
+        self.__time = time
 
 
 class Trial:
     """
     Class representing a single trial consisting of one single snipplet and all related data.
     """
+
     __description: str
     __created: datetime.datetime
     __keys: list
@@ -84,6 +116,9 @@ class Entry:
 
 
 class PeterJsonDecoder:
+    """
+    Class to decode peter json output and mapping it to python files.
+    """
     __log: logging.Logger
 
     def __init__(self):
@@ -130,17 +165,36 @@ class PeterJsonDecoder:
 
             for trial_entry in entry.get('trials'):
                 self.__log.debug("Decoding trial with snipplet \"%s\"", trial_entry.get('file'))
+
+                events:list = list()
+                for event in trial_entry.get('events'):
+                    events.append(Event(code=event.get('code'),
+                                        type=event.get('type'),
+                                        time=datetime.datetime.strptime(event.get('time'), '%Y-%m-%dT%H:%M:%S.%fZ')
+                                        )
+                                  )
+
+
+                keys:list = list()
+                for key in trial_entry.get('keys'):
+                    keys.append(Key(line=key.get('line'),
+                                    code=key.get('code'),
+                                    name=key.get('name'),
+                                    time=datetime.datetime.strptime(key.get('time'), '%Y-%m-%dT%H:%M:%S.%fZ')
+                                    )
+                                )
+
                 trials.append(Trial(description=trial_entry.get('description'),
                                created=datetime.datetime.strptime(trial_entry.get('created'), '%Y-%m-%dT%H:%M:%S.%f'),
-                               keys=trial_entry.get('keys'),
+                               keys=keys,
                                correction=trial_entry.get('correction'),
                                submitted=datetime.datetime.strptime(trial_entry.get('submitted'), '%Y-%m-%dT%H:%M:%S.%fZ'),
                                state=trial_entry.get('state'),
                                file=trial_entry.get('file'),
                                linenumber=trial_entry.get('linenumber'),
-                               events=trial_entry.get('events')
-                               )
+                               events=events
                               )
+                            )
 
             data_output.append(Entry(timestamp=entry.get('_timestamp'),
                                      user_session_id=entry.get('USER_SESSION_ID'),

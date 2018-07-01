@@ -3,6 +3,7 @@
 import coloredlogs, logging
 from argparse import ArgumentParser
 from pathlib import Path
+import json_decoder
 
 
 if __name__ == "__main__":
@@ -49,13 +50,13 @@ if __name__ == "__main__":
 
     log.addHandler(ch)
 
-    p = Path(args.logdir)
+    logdir = Path(args.logdir)
 
     logfile = Path('peter_analyzer.log')
 
-    if p.exists():
-        if p.is_dir() :
-            fh = logging.FileHandler(p.joinpath(logfile))
+    if logdir.exists():
+        if logdir.is_dir() :
+            fh = logging.FileHandler(logdir.joinpath(logfile))
             fh.setLevel(logging.DEBUG)
 
             # create formatter and add it to the handlers
@@ -67,7 +68,7 @@ if __name__ == "__main__":
         else:
             log.error('Specified log dir is no directory')
     else:
-        logfile = Path.cwd().joinpath(p).joinpath(logfile)
+        logfile = Path.cwd().joinpath(logdir).joinpath(logfile)
         logfile.parent.mkdir(parents=True, exist_ok=True)
 
         fh = logging.FileHandler(logfile)
@@ -94,24 +95,30 @@ if __name__ == "__main__":
         log.info("Output path :" + str(output_path.resolve()))
 
     input_path = Path(args.input)
-    if input_path.exists():
+    if input_path.is_absolute():
         if input_path.is_file():
             log.info("Input path :" + str(input_path.resolve()))
             if not input_path.suffix == ".json":
                 log.error("Input file not a json file.")
                 exit(-1)
-
-
-
         else:
             log.error("Input param not a file.")
             exit(-1)
 
     else:
-        log.error("Input param file or folder does not exist!")
-        exit(-1)
+        input_path = Path().cwd().joinpath(input_path).resolve()
+        if input_path.is_file():
+            log.info("Input path :" + str(input_path.resolve()))
+            if not input_path.suffix == ".json":
+                log.error("Input file not a json file.")
+                exit(-1)
+        else:
+            log.error("Input param not a file or doesnt exist")
+            exit(-1)
 
-
+    j = json_decoder.PeterJsonDecoder(verbose=args.verbose, logdir=logdir)
+    data = j.decode(open(input_path))
+    log.info("Loaded " + str(data.__len__()) + " elements!" )
 
 
 

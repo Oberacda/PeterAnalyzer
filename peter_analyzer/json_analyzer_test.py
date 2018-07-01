@@ -1,11 +1,11 @@
 import unittest
 from typing import TextIO
 
-from peter_analyzer import json_analyzer
+from peter_analyzer import json_decoder
 
 class PeterJsonDecoderTest(unittest.TestCase):
 
-    jsonDecoder : json_analyzer.PeterJsonDecoder
+    jsonDecoder : json_decoder.PeterJsonDecoder
     fullDatabaseFile : TextIO
     singleDatabaseEntry : TextIO
     invalidDatabaseEntry : TextIO
@@ -14,7 +14,7 @@ class PeterJsonDecoderTest(unittest.TestCase):
         self.fullDatabaseFile = open("../resources/db-2018-06-19.json")
         self.singleDatabaseEntry = open("../resources/example_entry.json")
         self.invalidDatabaseEntry = open("../resources/db-2018-06-19.jso")
-        self.jsonDecoder = json_analyzer.PeterJsonDecoder()
+        self.jsonDecoder = json_decoder.PeterJsonDecoder()
 
     def tearDown(self):
         self.fullDatabaseFile.close()

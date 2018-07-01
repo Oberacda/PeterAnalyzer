@@ -3,6 +3,7 @@ import logging
 from json import JSONDecodeError
 from typing import TextIO
 import datetime
+from pathlib import Path
 
 import coloredlogs
 
@@ -123,24 +124,56 @@ class PeterJsonDecoder:
     """
     __log: logging.Logger
 
-    def __init__(self):
-        self.__log = logging.getLogger("PeterJsonDecoder")
+    def __init__(self, verbose:bool, logdir:Path):
+        """
+        Creates a new json decoder
+        :param verbose: should the decoder log verbose
+        :param logdir: the directory to save log files.
+        """
+        self.__log = logging.getLogger("JsonDecoder")
         self.__log.setLevel(logging.DEBUG)
 
-        fh = logging.FileHandler('peter_json_decoder.log')
-        fh.setLevel(logging.DEBUG)
+        formatter = coloredlogs.ColoredFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
         # create console handler with a higher log level
         ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-
-        # create formatter and add it to the handlers
-        formatter = coloredlogs.ColoredFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 
-        self.__log.addHandler(fh)
+        if verbose:
+
+            ch.setLevel(logging.INFO)
+        else:
+            ch.setLevel(logging.ERROR)
+
         self.__log.addHandler(ch)
+
+        logfile = Path('peter_json_decoder.log')
+
+        if logdir.exists():
+            if logdir.is_dir():
+                fh = logging.FileHandler(logdir.joinpath(logfile))
+                fh.setLevel(logging.DEBUG)
+
+                # create formatter and add it to the handlers
+
+                fh.setFormatter(formatter)
+
+                self.__log.addHandler(fh)
+
+            else:
+                self.__log.error('Specified log dir is no directory')
+        else:
+            logfile = Path.cwd().joinpath(p).joinpath(logfile)
+            logfile.parent.mkdir(parents=True, exist_ok=True)
+
+            fh = logging.FileHandler(logfile)
+            fh.setLevel(logging.DEBUG)
+
+            # create formatter and add it to the handlers
+
+            fh.setFormatter(formatter)
+
+            self.__log.addHandler(fh)
 
     def decode(self, json_file: TextIO) -> list:
         """
@@ -205,4 +238,4 @@ class PeterJsonDecoder:
                                      trials=trials)
                                )
 
-        return data
+        return data_output

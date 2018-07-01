@@ -4,6 +4,8 @@ from json import JSONDecodeError
 from typing import TextIO
 import datetime
 
+import coloredlogs
+
 
 class Key:
     """
@@ -133,7 +135,7 @@ class PeterJsonDecoder:
         ch.setLevel(logging.INFO)
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = coloredlogs.ColoredFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 

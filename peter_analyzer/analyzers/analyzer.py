@@ -8,3 +8,6 @@ class Analyzer:
 
     def  analyze(self):
         pass
+
+class TestAnalyzer(Analyzer):
+   pass

@@ -1,9 +1,14 @@
 #!/usr/local/bin/python3
+import importlib
+import os
 
 import coloredlogs, logging
 from argparse import ArgumentParser
 from pathlib import Path
 import json_decoder
+
+import pkgutil
+import analyzers.analyzer
 
 
 if __name__ == "__main__":
@@ -120,5 +125,12 @@ if __name__ == "__main__":
     data = j.decode(open(input_path))
     log.info("Loaded " + str(data.__len__()) + " elements!" )
 
+    pkg_dir = os.path.dirname("./analyzers/analyzer.py")
 
+    for (module_loader, name, ispkg) in pkgutil.iter_modules([pkg_dir]):
+        importlib.import_module('.' + name, "analyzers")
+
+    all_my_base_classes = {cls.__name__: cls for cls in analyzers.analyzer.Analyzer.__subclasses__()}
+
+    print(all_my_base_classes)
 

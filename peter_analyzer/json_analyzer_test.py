@@ -1,5 +1,6 @@
 import unittest
 from typing import TextIO
+from pathlib import Path
 
 from peter_analyzer import json_decoder
 
@@ -11,10 +12,10 @@ class PeterJsonDecoderTest(unittest.TestCase):
     invalidDatabaseEntry : TextIO
 
     def setUp(self):
-        self.fullDatabaseFile = open("../resources/db-2018-06-19.json")
+        self.fullDatabaseFile = open("../resources/db-2018-07-05.json")
         self.singleDatabaseEntry = open("../resources/example_entry.json")
         self.invalidDatabaseEntry = open("../resources/db-2018-06-19.jso")
-        self.jsonDecoder = json_decoder.PeterJsonDecoder()
+        self.jsonDecoder = json_decoder.PeterJsonDecoder(True, Path.cwd())
 
     def tearDown(self):
         self.fullDatabaseFile.close()
@@ -22,7 +23,7 @@ class PeterJsonDecoderTest(unittest.TestCase):
         self.invalidDatabaseEntry.close()
 
     def test_decoding(self):
-        self.jsonDecoder.decode(self.fullDatabaseFile)
+        d = self.jsonDecoder.decode(self.fullDatabaseFile)
 
     def test_decoding_invalid(self):
         self.assertListEqual(self.jsonDecoder.decode(self.invalidDatabaseEntry), list())

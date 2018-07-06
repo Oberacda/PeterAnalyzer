@@ -8,8 +8,7 @@ from pathlib import Path
 import json_decoder
 
 import pkgutil
-import analyzers.analyzer
-
+import data_set_creator.data_set_creator
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -47,7 +46,7 @@ if __name__ == "__main__":
     ch = logging.StreamHandler()
     ch.setFormatter(formatter)
 
-    if args.verbose :
+    if args.verbose:
 
         ch.setLevel(logging.INFO)
     else:
@@ -60,7 +59,7 @@ if __name__ == "__main__":
     logfile = Path('peter_analyzer.log')
 
     if logdir.exists():
-        if logdir.is_dir() :
+        if logdir.is_dir():
             fh = logging.FileHandler(logdir.joinpath(logfile))
             fh.setLevel(logging.DEBUG)
 
@@ -123,14 +122,15 @@ if __name__ == "__main__":
 
     j = json_decoder.PeterJsonDecoder(verbose=args.verbose, logdir=logdir)
     data = j.decode(open(input_path))
-    log.info("Loaded " + str(data.__len__()) + " elements!" )
+    log.info("Loaded " + str(data.__len__()) + " elements!")
 
-    pkg_dir = os.path.dirname("./analyzers/analyzer.py")
+    pkg_dir = os.path.dirname("./data_set_creator/data_set_creator.py")
 
     for (module_loader, name, ispkg) in pkgutil.iter_modules([pkg_dir]):
-        importlib.import_module('.' + name, "analyzers")
+        importlib.import_module('.' + name, "data_set_creator")
 
-    all_my_base_classes = {cls.__name__: cls for cls in analyzers.analyzer.Analyzer.__subclasses__()}
+    all_creators = data_set_creator.data_set_creator.DataSetCreator.__subclasses__()
 
-    print(all_my_base_classes)
-
+    for creator in all_creators:
+        r = creator(data, log)
+        r.create(output_path)

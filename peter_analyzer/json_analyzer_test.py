@@ -12,9 +12,9 @@ class PeterJsonDecoderTest(unittest.TestCase):
     invalidDatabaseEntry : TextIO
 
     def setUp(self):
-        self.fullDatabaseFile = open("../resources/db-2018-07-05.json")
+        self.fullDatabaseFile = open("../resources/db-full.json")
         self.singleDatabaseEntry = open("../resources/example_entry.json")
-        self.invalidDatabaseEntry = open("../resources/db-2018-06-19.jso")
+        self.invalidDatabaseEntry = open("../resources/db-invalid.jso")
         self.jsonDecoder = json_decoder.PeterJsonDecoder(True, Path.cwd())
 
     def tearDown(self):

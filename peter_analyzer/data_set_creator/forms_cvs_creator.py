@@ -102,7 +102,7 @@ class FormCvsCreator(DataSetCreator):
                             "csharp",
                             "net",
                             "php"]
-            output_file_path = ouputPath.joinpath(Path("forms_2.csv")).resolve()
+            output_file_path = ouputPath.joinpath(Path("forms_2.csv")).resolve().absolute()
             if output_file_path.is_absolute():
                 output_file_path.touch(mode=0o777, exist_ok=True)
                 if output_file_path.is_file():
@@ -157,11 +157,7 @@ class FormCvsCreator(DataSetCreator):
                         "encountered_distraction"
                         ]
 
-
-
-
-
-        output_file_path = ouputPath.joinpath(Path("forms.csv")).resolve()
+        output_file_path = ouputPath.joinpath(Path("forms.csv")).resolve().absolute()
         if output_file_path.is_absolute():
             output_file_path.touch(mode=0o777, exist_ok=True)
             if output_file_path.is_file():

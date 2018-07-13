@@ -1,137 +1,136 @@
-import logging
-import tkinter as tk
-from tkinter import ttk
+#!/usr/local/bin/python3
+import importlib
+import os
 
-LARGE_FONT = ("Verdana", 12)
+import coloredlogs, logging
+from argparse import ArgumentParser
+from pathlib import Path
+import json_decoder
 
-import matplotlib
-
-matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-from matplotlib.figure import Figure
-
-
-class PeterAnalyzer(tk.Tk):
-    __log: logging.Logger
-
-    def __init__(self, *args, **kwargs):
-        self.__log = logging.getLogger("PeterAnalyzer")
-        self.__log.setLevel(logging.DEBUG)
-
-        fh = logging.FileHandler('peter_analyzer.log')
-        fh.setLevel(logging.DEBUG)
-
-        # create console handler with a higher log level
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
-
-        self.__log.addHandler(fh)
-        self.__log.addHandler(ch)
-
-        tk.Tk.__init__(self, *args, **kwargs)
-
-        container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
-        self.frames = {}
-
-        for F in (StartPage, PageOne, PageTwo, PageThree):
-            frame = F(container, self)
-
-            self.frames[F] = frame
-
-            frame.grid(row=0, column=0, sticky="nsew")
-
-        self.show_frame(StartPage)
-
-    def show_frame(self, cont):
-        frame = self.frames[cont]
-        frame.tkraise()
-
-
-class StartPage(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Start Page", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
-
-        button = ttk.Button(self, text="Visit Page 1",
-                            command=lambda: controller.show_frame(PageOne))
-        button.pack()
-
-        button2 = ttk.Button(self, text="Visit Page 2",
-                             command=lambda: controller.show_frame(PageTwo))
-        button2.pack()
-
-        button3 = ttk.Button(self, text="Graph Page",
-                             command=lambda: controller.show_frame(PageThree))
-        button3.pack()
-
-
-class PageOne(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Page One!!!", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
-
-        button1 = ttk.Button(self, text="Back to Home",
-                             command=lambda: controller.show_frame(StartPage))
-        button1.pack()
-
-        button2 = ttk.Button(self, text="Page Two",
-                             command=lambda: controller.show_frame(PageTwo))
-        button2.pack()
-
-
-class PageTwo(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Page Two!!!", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
-
-        button1 = ttk.Button(self, text="Back to Home",
-                             command=lambda: controller.show_frame(StartPage))
-        button1.pack()
-
-        button2 = ttk.Button(self, text="Page One",
-                             command=lambda: controller.show_frame(PageOne))
-        button2.pack()
-
-
-class PageThree(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Graph Page!", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
-
-        button1 = ttk.Button(self, text="Back to Home",
-                             command=lambda: controller.show_frame(StartPage))
-        button1.pack()
-
-        f = Figure(figsize=(5, 5), dpi=100)
-        a = f.add_subplot(111)
-        a.plot([1, 2, 3, 4, 5, 6, 7, 8], [5, 6, 1, 3, 8, 9, 3, 5])
-
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-
-        toolbar = NavigationToolbar2TkAgg(canvas, self)
-        toolbar.update()
-        canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
+import pkgutil
+import data_set_creator.data_set_creator
 
 if __name__ == "__main__":
-    app = PeterAnalyzer()
-    app.mainloop()
+    parser = ArgumentParser()
+    parser.add_argument("-l", "--log-dir",
+                        dest="logdir",
+                        help="destination of the logfiles",
+                        default="./logs/",
+                        metavar="DIR")
+
+    parser.add_argument("-q", "--quiet",
+                        action="store_false",
+                        dest="verbose",
+                        default=True,
+                        help="don't print log info messages to stdout")
+
+    parser.add_argument("-i", "--input",
+                        dest="input",
+                        help="Json input file containing the data.",
+                        required=True,
+                        metavar="FILE.json")
+
+    parser.add_argument("-o", "--output-dir",
+                        dest="output",
+                        default=".",
+                        help="Output dir for the data.",
+                        metavar="DIR")
+
+    args = parser.parse_args()
+
+    log = logging.getLogger("PeterAnalyzer")
+    log.setLevel(logging.DEBUG)
+    formatter = coloredlogs.ColoredFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+
+    if args.verbose:
+
+        ch.setLevel(logging.INFO)
+    else:
+        ch.setLevel(logging.ERROR)
+
+    log.addHandler(ch)
+
+    logdir = Path(args.logdir)
+
+    logfile = Path('peter_analyzer.log')
+
+    if logdir.exists():
+        if logdir.is_dir():
+            fh = logging.FileHandler(logdir.joinpath(logfile))
+            fh.setLevel(logging.DEBUG)
+
+            # create formatter and add it to the handlers
+
+            fh.setFormatter(formatter)
+
+            log.addHandler(fh)
+
+        else:
+            log.error('Specified log dir is no directory')
+    else:
+        logfile = Path.cwd().joinpath(logdir).joinpath(logfile)
+        logfile.parent.mkdir(parents=True, exist_ok=True)
+
+        fh = logging.FileHandler(logfile)
+        fh.setLevel(logging.DEBUG)
+
+        # create formatter and add it to the handlers
+
+        fh.setFormatter(formatter)
+
+        log.addHandler(fh)
+
+    output_path = Path(args.output)
+    if output_path.exists():
+        if output_path.is_dir():
+            log.info("Output path :" + str(output_path.resolve()))
+
+        else:
+            log.error("Output param not a directory using default.")
+            output_path = Path.cwd()
+
+    else:
+        output_path = Path.cwd().joinpath(output_path)
+        output_path.mkdir(parents=True, exist_ok=True)
+        log.info("Output path :" + str(output_path.resolve()))
+
+    input_path = Path(args.input)
+    if input_path.is_absolute():
+        if input_path.is_file():
+            log.info("Input path :" + str(input_path.resolve()))
+            if not input_path.suffix == ".json":
+                log.error("Input file not a json file.")
+                exit(-1)
+        else:
+            log.error("Input param not a file.")
+            exit(-1)
+
+    else:
+        input_path = Path().cwd().joinpath(input_path).resolve()
+        if input_path.is_file():
+            log.info("Input path :" + str(input_path.resolve()))
+            if not input_path.suffix == ".json":
+                log.error("Input file not a json file.")
+                exit(-1)
+        else:
+            log.error("Input param not a file or doesnt exist")
+            exit(-1)
+
+    j = json_decoder.PeterJsonDecoder(verbose=args.verbose, logdir=logdir)
+    data = j.decode(open(input_path))
+    log.info("Loaded " + str(data.__len__()) + " elements!")
+
+    pkg_dir = os.path.dirname("./data_set_creator/data_set_creator.py")
+
+    for (module_loader, name, ispkg) in pkgutil.iter_modules([pkg_dir]):
+        importlib.import_module('.' + name, "data_set_creator")
+
+    all_creators = data_set_creator.data_set_creator.DataSetCreator.__subclasses__()
+
+    for creator in all_creators:
+        r = creator(data, log)
+        r.create(output_path)

@@ -1,7 +1,10 @@
+import time
+
 from data_set_creator.data_set_creator import DataSetCreator
 from logging import Logger
 from pathlib import Path
 import csv
+import datetime
 
 
 class FormCvsCreator(DataSetCreator):
@@ -102,7 +105,8 @@ class FormCvsCreator(DataSetCreator):
                             "csharp",
                             "net",
                             "php"]
-            output_file_path = ouputPath.joinpath(Path("forms_2.csv")).resolve().absolute()
+            ts = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+            output_file_path = ouputPath.joinpath(Path("forms_" + ts.__str__() + ".csv")).resolve().absolute()
             if output_file_path.is_absolute():
                 output_file_path.touch(mode=0o777, exist_ok=True)
                 if output_file_path.is_file():
@@ -157,7 +161,8 @@ class FormCvsCreator(DataSetCreator):
                         "encountered_distraction"
                         ]
 
-        output_file_path = ouputPath.joinpath(Path("forms.csv")).resolve().absolute()
+        ts = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H%M%S')
+        output_file_path = ouputPath.joinpath(Path("forms_" + ts.__str__() + ".csv")).resolve().absolute()
         if output_file_path.is_absolute():
             output_file_path.touch(mode=0o777, exist_ok=True)
             if output_file_path.is_file():

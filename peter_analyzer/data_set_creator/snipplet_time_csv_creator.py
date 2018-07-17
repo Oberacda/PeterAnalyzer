@@ -27,20 +27,11 @@ class SnippletTimeCvsCreator(DataSetCreator):
         return "%s.%s" % (snippet, attribute)
 
     def create(self, ouputPath: Path):
-        snippet_perms = itertools.permutations(self.group)
 
-        snippets = dict()
+        snippets = list()
 
-        for p in self.group:
-            snippets[self._addAttribute(self._addAttribute(p, self.tasks[0]),self.identifier_quality[0])] = list()
-            snippets[self._addAttribute(self._addAttribute(p, self.tasks[0]), self.identifier_quality[1])] = list()
-            snippets[self._addAttribute(self._addAttribute(p, self.tasks[1]),self.identifier_quality[0])]= list()
-            snippets[self._addAttribute(self._addAttribute(p, self.tasks[1]),self.identifier_quality[1])] = list()
-
-        print(snippets)
         for entry in self.data:
             for trial in entry._Entry__trials:
-                print(trial)
                 starttime : datetime.datetime = None
                 endtime : datetime.datetime = None
 
@@ -52,25 +43,24 @@ class SnippletTimeCvsCreator(DataSetCreator):
                     if event._Event__code == "Elapsed" and event._Event__type == "Clock":
                         endtime = event._Event__time
                 deltatime = endtime - starttime
-                snippets[trial._Trial__snipplet[:-5]].append({"time": deltatime.total_seconds(), "state": trial._Trial__state})
+                snippets.append({"snippet": trial._Trial__snipplet[:-5], "time": deltatime.total_seconds(), "state": trial._Trial__state})
 
-        for key in snippets:
-            ts = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
-            output_file_path = ouputPath.joinpath(Path("snippet_time_" + key.replace(".", "-") + "_" + ts.__str__() + ".csv")).resolve().absolute()
-            if output_file_path.is_absolute():
-                output_file_path.touch(mode=0o777, exist_ok=True)
-                if output_file_path.is_file():
-                    output_file = output_file_path.open(mode='w')
-                    writer = csv.DictWriter(output_file, fieldnames=['state', 'time'], dialect='excel',
+        ts = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+        output_file_path = ouputPath.joinpath(Path("snippet_time_" + ts.__str__() + ".csv")).resolve().absolute()
+        if output_file_path.is_absolute():
+            output_file_path.touch(mode=0o777, exist_ok=True)
+            if output_file_path.is_file():
+                output_file = output_file_path.open(mode='w')
+                writer = csv.DictWriter(output_file, fieldnames=['snippet','state', 'time'], dialect='excel',
                                             quoting=csv.QUOTE_NONNUMERIC,
                                             delimiter=';')
-                    writer.writeheader()
-                    writer.writerows(snippets[key])
-                    self.log.debug("Successfully wrote " + key + ".csv")
-                else:
-                    self.log.error("Output file cannot be created!")
-                    exit(-1)
+                writer.writeheader()
+                writer.writerows(snippets)
+                self.log.debug("Successfully wrote snippet_time .csv")
             else:
-                self.log.error("Output file path cannot be resolved!")
+                self.log.error("Output file cannot be created!")
                 exit(-1)
+        else:
+            self.log.error("Output file path cannot be resolved!")
+            exit(-1)
 

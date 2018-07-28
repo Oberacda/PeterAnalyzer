@@ -1,5 +1,4 @@
-import itertools
-import random
+import platform
 import time
 
 from data_set_creator.data_set_creator import DataSetCreator
@@ -16,8 +15,16 @@ class SnippletTimeCvsCreator(DataSetCreator):
     identifier : list
     group : list
 
+    __delimiter : str = ';'
+
+
+
     def __init__(self, data: list, log: Logger):
         super().__init__(data, log)
+
+        currentSystem = platform.system()
+        if(currentSystem == 'Windows'):
+            self.__delimiter = ','
 
         self.tasks = ['semantic', 'syntactic']
         self.identifier_quality = ['def', 'req']
@@ -43,7 +50,9 @@ class SnippletTimeCvsCreator(DataSetCreator):
                     if event._Event__code == "Elapsed" and event._Event__type == "Clock":
                         endtime = event._Event__time
                 deltatime = endtime - starttime
-                snippets.append({"snippet": trial._Trial__snipplet[:-5], "time": deltatime.total_seconds(), "state": trial._Trial__state})
+                currentSnipplet = trial._Trial__snipplet[:-5].split('.')
+                assert currentSnipplet.__len__() == 3
+                snippets.append({"snippet": currentSnipplet[0],"constructor": currentSnipplet[2], "type" : currentSnipplet[1] , "time": deltatime.total_seconds(), "state": trial._Trial__state})
 
         ts = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
         output_file_path = ouputPath.joinpath(Path("snippet_time_" + ts.__str__() + ".csv")).resolve().absolute()
@@ -51,9 +60,9 @@ class SnippletTimeCvsCreator(DataSetCreator):
             output_file_path.touch(mode=0o777, exist_ok=True)
             if output_file_path.is_file():
                 output_file = output_file_path.open(mode='w')
-                writer = csv.DictWriter(output_file, fieldnames=['snippet','state', 'time'], dialect='excel',
+                writer = csv.DictWriter(output_file, fieldnames=['snippet','constructor','type','state', 'time'], dialect='excel',
                                             quoting=csv.QUOTE_NONNUMERIC,
-                                            delimiter=';')
+                                            delimiter=self.__delimiter)
                 writer.writeheader()
                 writer.writerows(snippets)
                 self.log.debug("Successfully wrote snippet_time .csv")

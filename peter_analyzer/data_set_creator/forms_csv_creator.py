@@ -1,4 +1,5 @@
 import time
+import platform
 
 from data_set_creator.data_set_creator import DataSetCreator
 from logging import Logger
@@ -12,9 +13,15 @@ class FormCvsCreator(DataSetCreator):
 
     __seperate:bool
 
+    __delimiter : str = ';'
+
     def __init__(self, data: list, log: Logger, seperate: bool = False):
         super().__init__(data, log)
         self.__seperate = seperate
+
+        currentSystem = platform.system()
+        if (currentSystem == 'Windows'):
+            self.delimiter = ','
 
     def create(self, ouputPath: Path):
 
@@ -113,7 +120,7 @@ class FormCvsCreator(DataSetCreator):
                     output_file = output_file_path.open(mode='w')
                     writer = csv.DictWriter(output_file, fieldnames=fieldnames_2, dialect='excel',
                                             quoting=csv.QUOTE_NONNUMERIC,
-                                            delimiter=';')
+                                            delimiter=self.__delimiter)
                     writer.writeheader()
                     writer.writerows(result_2)
                     self.log.debug("Successfully wrote forms_2.csv")
@@ -169,7 +176,7 @@ class FormCvsCreator(DataSetCreator):
                 output_file = output_file_path.open(mode='w')
                 writer = csv.DictWriter(output_file, fieldnames=fieldnames, dialect='excel',
                                         quoting=csv.QUOTE_NONNUMERIC,
-                                        delimiter=';')
+                                        delimiter=self.__delimiter)
                 writer.writeheader()
                 writer.writerows(result_4)
                 self.log.debug("Successfully wrote forms.csv")

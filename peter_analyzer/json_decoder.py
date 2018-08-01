@@ -26,7 +26,7 @@ class Key:
         :param name: the name of the key event.
         :param time: the time the event occurred.
         """
-        self.__line = list
+        self.__line = line.copy()
         self.__code = code
         self.__name = name
         self.__time = time

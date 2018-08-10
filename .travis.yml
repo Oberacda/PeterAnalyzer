@@ -1,0 +1,17 @@
+language: python
+sudo: false
+
+python:
+  - "3.6"
+
+cache: pip
+
+install:
+  - pip install -r requirements.txt
+  - pip install codecov
+
+script:
+  - pytest --cov-report term-missing --cov=peter_analyzer -v test/
+
+after_success:
+- codecov

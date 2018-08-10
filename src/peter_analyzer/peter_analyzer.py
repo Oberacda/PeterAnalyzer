@@ -7,9 +7,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 import pkgutil
 
-from . import json_decoder
-from data_set_creator import data_set_creator
-
+from . import json_decoder, data_set_creator
 
 
 def main(args:list):

@@ -5,7 +5,7 @@ import os
 import coloredlogs, logging
 from argparse import ArgumentParser
 from pathlib import Path
-from peter_analyzer import json_decoder
+from . import json_decoder
 
 import pkgutil
 import data_set_creator.data_set_creator

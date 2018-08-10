@@ -5,6 +5,7 @@ from pathlib import Path
 from src.peter_analyzer import json_decoder
 from src.peter_analyzer import peter_analyzer
 
+
 class PeterJsonDecoderTest(unittest.TestCase):
 
     jsonDecoder : json_decoder.PeterJsonDecoder

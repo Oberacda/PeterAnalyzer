@@ -8,6 +8,7 @@ from pathlib import Path
 import pkgutil
 
 from . import json_decoder
+from data_set_creator import data_set_creator
 
 
 
@@ -130,7 +131,7 @@ def main(args:list):
     for (module_loader, name, ispkg) in pkgutil.iter_modules([pkg_dir]):
         importlib.import_module('.' + name, "data_set_creator")
 
-    all_creators = data_set_creator.data_set_creator.DataSetCreator.__subclasses__()
+    all_creators = data_set_creator.DataSetCreator.__subclasses__()
 
     for creator in all_creators:
         r = creator(data, log)

@@ -2,8 +2,7 @@ import unittest
 from typing import TextIO
 from pathlib import Path
 
-from src.peter_analyzer import json_decoder
-from src.peter_analyzer import peter_analyzer
+from peter_analyzer import json_decoder, peter_analyzer
 
 
 class PeterJsonDecoderTest(unittest.TestCase):
@@ -39,7 +38,7 @@ class PeterJsonDecoderTest(unittest.TestCase):
 
     def test_run(self):
         self.tearDown()
-        peter_analyzer.main(["-i", "./resources/db-full.json", "-o","./out","-q"])
+        peter_analyzer.main(["-i", "./resources/db-full.json", "-o", "./out", "-q"])
 
 if __name__ == '__main__':
     unittest.main()

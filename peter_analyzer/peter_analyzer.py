@@ -7,8 +7,8 @@ from argparse import ArgumentParser
 from pathlib import Path
 import pkgutil
 
-from . import json_decoder, data_set_creator
-
+from peter_analyzer import json_decoder
+from peter_analyzer.data_set_creator import data_set_creator
 
 def main(args:list):
     parser = ArgumentParser()
@@ -130,7 +130,6 @@ def main(args:list):
         importlib.import_module('.' + name, "data_set_creator")
 
     all_creators = data_set_creator.DataSetCreator.__subclasses__()
-
     for creator in all_creators:
         r = creator(data, log)
         r.create(output_path)

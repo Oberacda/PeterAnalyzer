@@ -1,3 +1,5 @@
 matplotlib >= 2.2.0
 DateTime >= 4.2
 coloredlogs
+pytest
+pytest-cov

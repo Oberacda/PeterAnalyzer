@@ -19,6 +19,7 @@ deploy:
   api_key:
     secure: GoKTK5Ef7lSwtBqDVWAddqXRJmyK1PNfYGonsxSO/r50BqLxEKW0uW7LtoFw/mXi+Q6jInU2Cgb4J4R1mI3tUYRMpjAk2pSgiYhY2R0lJX6qk59qzW4HVpqFUG7+NCT2WPPrHWZl7oOE7CkjEIsilIq1AU/xnVOMnDXNePjo5K0dOS6qzIwaE9Kyj5t4xYnjd4lJUhfI2a10PNtfSNkGnx4NuoeS/WLWUZLBdBDsr8jDfNbSl0m2BTMPS1ROTdZLHAzZTdpOTZFxoUlKAJOvGMCRYLQAGbKyWNJNint2O/BhWabQZ9sVt31pbjnQytm1BWglXU9iXuYce2mhPaSWcNqSUwoebzloq3JniNV/hdAVFugwvcj8f64zGb3Ns0hjCpdvm6Ai02LuTO5TbDeo4tmShN34zwaNb4ZZ36k5LpWH2VBQBmiShrvi1fubgJhFzy+vZNBkFyWmeqbCes4WW4ELOn7ObLYB83wQAd/xwPTCuuiAb++DfAlqLctUXOWTQNBIx/VXxf4fuHvAz/HeU56Dnmxvbkt66Lks0bdcbA+mJ1Zr2Xt82Yqzun+bBMdbb8uxup0Or3eW8pNKB/UJwlFS9/Ha5QPGZWhKuXnCtsDHJovYwtobuDbcgcitastkr0xFmmUW9Hy7ygdDQoYYWFrLkvgTHW+8CWjaCi25UtE=
   file: dist/**/*
+  skip_cleanup: true
   on:
     repo: Oberacda/PeterAnalyzer
     branch: 

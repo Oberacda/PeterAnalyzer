@@ -1,9 +1,9 @@
+import datetime
 import json
 import logging
 from json import JSONDecodeError
-from typing import TextIO
-import datetime
 from pathlib import Path
+from typing import TextIO
 
 import coloredlogs
 
@@ -18,7 +18,7 @@ class Key:
     __name: str
     __time: str
 
-    def __init__(self, line:list, code:int, name:str, time:datetime.datetime):
+    def __init__(self, line: list, code: int, name: str, time: datetime.datetime):
         """
         Creates a new key event.
         :param line: the lines shown to the user while the key was pressed.
@@ -31,6 +31,7 @@ class Key:
         self.__name = name
         self.__time = time
 
+
 class Event:
     """
     Class representing a single event that occures during a trial.
@@ -40,7 +41,7 @@ class Event:
     __type: str
     __time: datetime.datetime
 
-    def __init__(self, code:str, type:str, time:datetime.datetime):
+    def __init__(self, code: str, type: str, time: datetime.datetime):
         """
         Creates a new event.
         :param code: code of the event.
@@ -124,7 +125,7 @@ class PeterJsonDecoder:
     """
     __log: logging.Logger
 
-    def __init__(self, verbose:bool, logdir:Path):
+    def __init__(self, verbose: bool, logdir: Path):
         """
         Creates a new json decoder
         :param verbose: should the decoder log verbose
@@ -163,7 +164,7 @@ class PeterJsonDecoder:
             else:
                 self.__log.error('Specified log dir is no directory')
         else:
-            logfile = Path.cwd().joinpath(p).joinpath(logfile)
+            logfile = Path.cwd().joinpath(logdir).joinpath(logfile)
             logfile.parent.mkdir(parents=True, exist_ok=True)
 
             fh = logging.FileHandler(logfile)
@@ -196,12 +197,12 @@ class PeterJsonDecoder:
         for entry in data:
 
             self.__log.debug("Decoding entry with id \"%s\"", entry.get('_id'))
-            trials:list = list()
+            trials: list = list()
 
             for trial_entry in entry.get('trials'):
                 self.__log.debug("Decoding trial with snipplet \"%s\"", trial_entry.get('file'))
 
-                events:list = list()
+                events: list = list()
                 for event in trial_entry.get('events'):
                     events.append(Event(code=event.get('code'),
                                         type=event.get('type'),
@@ -209,8 +210,7 @@ class PeterJsonDecoder:
                                         )
                                   )
 
-
-                keys:list = list()
+                keys: list = list()
                 for key in trial_entry.get('keys'):
                     keys.append(Key(line=key.get('line'),
                                     code=key.get('code'),
@@ -220,16 +220,18 @@ class PeterJsonDecoder:
                                 )
 
                 trials.append(Trial(description=trial_entry.get('description'),
-                               created=datetime.datetime.strptime(trial_entry.get('created'), '%Y-%m-%dT%H:%M:%S.%f'),
-                               keys=keys,
-                               correction=trial_entry.get('correction'),
-                               submitted=datetime.datetime.strptime(trial_entry.get('submitted'), '%Y-%m-%dT%H:%M:%S.%fZ'),
-                               state=trial_entry.get('state'),
-                               file=trial_entry.get('file'),
-                               linenumber=trial_entry.get('linenumber'),
-                               events=events
+                                    created=datetime.datetime.strptime(trial_entry.get('created'),
+                                                                       '%Y-%m-%dT%H:%M:%S.%f'),
+                                    keys=keys,
+                                    correction=trial_entry.get('correction'),
+                                    submitted=datetime.datetime.strptime(trial_entry.get('submitted'),
+                                                                         '%Y-%m-%dT%H:%M:%S.%fZ'),
+                                    state=trial_entry.get('state'),
+                                    file=trial_entry.get('file'),
+                                    linenumber=trial_entry.get('linenumber'),
+                                    events=events
+                                    )
                               )
-                            )
 
             data_output.append(Entry(timestamp=entry.get('_timestamp'),
                                      user_session_id=entry.get('USER_SESSION_ID'),

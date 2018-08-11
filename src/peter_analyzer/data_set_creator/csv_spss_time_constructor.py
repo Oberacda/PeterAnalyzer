@@ -7,7 +7,7 @@ import csv
 import datetime
 
 class SnippletTimeCvsCreator(DataSetCreator):
-    name = "CSV-Spss_TimeConstructor"
+    name = "CSV-Spss_Time-Constructor"
 
     __snipplet_name = []
     task : list

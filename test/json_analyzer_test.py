@@ -2,7 +2,8 @@ import unittest
 from typing import TextIO
 from pathlib import Path
 
-from peter_analyzer import json_decoder, peter_analyzer
+from peter_analyzer import json_decoder
+import peter_csv_analyzer
 
 
 class PeterJsonDecoderTest(unittest.TestCase):
@@ -16,7 +17,7 @@ class PeterJsonDecoderTest(unittest.TestCase):
         self.fullDatabaseFile = open("./resources/db-full.json")
         self.singleDatabaseEntry = open("./resources/example_entry.json")
         self.invalidDatabaseEntry = open("./resources/db-invalid.jso")
-        self.jsonDecoder = json_decoder.PeterJsonDecoder(False, Path.cwd())
+        self.jsonDecoder = json_decoder.PeterJsonDecoder(False, Path("../logs/"))
 
     def tearDown(self):
         self.fullDatabaseFile.close()
@@ -38,7 +39,7 @@ class PeterJsonDecoderTest(unittest.TestCase):
 
     def test_run(self):
         self.tearDown()
-        peter_analyzer.main(["-i", "./resources/db-full.json", "-o", "./out", "-q"])
+        peter_csv_analyzer.main(["-i", "./resources/db-full.json", "-o", "./out", "-q", "-l" , "../logs/"])
 
 if __name__ == '__main__':
     unittest.main()

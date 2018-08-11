@@ -45,6 +45,7 @@ class SnippletLineTimeCvsCreator(DataSetCreator):
                 defectline : int = 0
                 docline : int = 0
                 maxline : int = 0
+                sum : int = 0
 
 
                 currentSnipplet = trial._Trial__snipplet[:-5].split('.')
@@ -62,22 +63,26 @@ class SnippletLineTimeCvsCreator(DataSetCreator):
                     defectline = 144
                     docline = 100
                     maxline = 185
+                    sum = 184
 
                 if currentSnippletDict["snippet"] == "zipper":
                     defectline = 155
                     docline = 111
                     maxline = 177
+                    sum = 180
 
 
                 if currentSnippletDict["snippet"] == "passwordutils":
                     defectline = 189
                     docline = 136
                     maxline = 205
+                    sum = 204
 
                 if currentSnippletDict["snippet"] == "cpanalyzer":
                     defectline = 111
                     maxline = 136
                     docline = 81
+                    sum = 136
 
                 assert defectline > 0 and maxline > 0 and docline > 0
                 assert docline < defectline < maxline
@@ -97,8 +102,6 @@ class SnippletLineTimeCvsCreator(DataSetCreator):
                     assert key._Key__line.__len__() == 2
 
                     for line in range(firstline, lastline):
-                        currentLine = {"time": delta.total_seconds(),
-                                         "line": line}
 
                         lable : str = None
 
@@ -113,14 +116,15 @@ class SnippletLineTimeCvsCreator(DataSetCreator):
 
                         assert lable is not None
 
-                        cline = next((item for item in currentSnippletDict['lines'] if item["line"] == line),None)
+                        cline = next((item for item in currentSnippletDict['lines'] if item["line"] == line and item["id"] == entry._Entry__id), None)
 
                         if cline is not None:
                             previousLine = currentSnippletDict['lines'].pop(currentSnippletDict['lines'].index(cline))
-                            currentSnippletDict['lines'].append({"time": delta.total_seconds() + previousLine['time'],
-                                         "line": line, "lable" : lable})
+                            currentSnippletDict['lines'].append({"id": entry._Entry__id,"time": delta.total_seconds() / sum + previousLine['time'],
+                                                                 "line": line, "lable": lable})
                         else:
-                            currentSnippletDict['lines'].append(currentLine)
+                            currentSnippletDict['lines'].append({"id": entry._Entry__id, "time": delta.total_seconds() / sum,
+                                       "line": line, "lable": lable})
 
                     if key._Key__name == 'down':
                         if lastline + 2 < maxline:
@@ -147,7 +151,7 @@ class SnippletLineTimeCvsCreator(DataSetCreator):
             output_file_path.touch(mode=0o777, exist_ok=True)
             if output_file_path.is_file():
                 output_file = output_file_path.open(mode='w')
-                writer = csv.DictWriter(output_file, fieldnames=['snippet','constructor','type','line', 'lable', 'time'], dialect='excel',
+                writer = csv.DictWriter(output_file, fieldnames=['snippet','constructor','type', 'id', 'line', 'lable', 'time'], dialect='excel',
                                             quoting=csv.QUOTE_NONNUMERIC,
                                             delimiter=self.__delimiter)
                 writer.writeheader()

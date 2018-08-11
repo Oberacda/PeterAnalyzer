@@ -1,16 +1,18 @@
 #!/usr/local/bin/python3
 import importlib
+import logging
 import os
-
-import coloredlogs, logging
+import pkgutil
 from argparse import ArgumentParser
 from pathlib import Path
-import pkgutil
+
+import coloredlogs
 
 from peter_analyzer import json_decoder
 from peter_analyzer.data_set_creator import data_set_creator
 
-def main(args:list):
+
+def main(args: list):
     parser = ArgumentParser()
     parser.add_argument("-l", "--log-dir",
                         dest="logdir",
@@ -135,7 +137,7 @@ def main(args:list):
         r.create(output_path)
 
 
-
 if __name__ == "__main__":
     import sys
+
     main(sys.argv[1:])

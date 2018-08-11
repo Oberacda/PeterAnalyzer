@@ -6,6 +6,9 @@ python:
 
 cache: pip
 
+env:
+  - PYTHONPATH="src"
+
 install:
   - pip install -r requirements.txt
   - pip install codecov
